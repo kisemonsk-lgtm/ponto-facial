@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>Ponto Facial — Registro de Ponto</title>
+<meta name="description" content="Bata o ponto pelo reconhecimento facial. App gratuito, funciona no tablet sem internet e sincroniza com o Ponto Livre.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icone-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ponto Facial">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<!-- ================= TELA DE ACESSO ================= -->
+<section id="telaAcesso" class="acesso">
+  <div class="acesso-card">
+    <img src="icone-192.png" alt="" class="acesso-logo">
+    <h1>Ponto Facial</h1>
+    <p class="acesso-sub">Bata o ponto olhando para a câmera</p>
+    <div id="acessoCarregando" class="acesso-carregando">Carregando funcionários…</div>
+    <div id="acessoVazio" class="oculto">
+      <p class="aviso">Nenhum funcionário cadastrado.</p>
+      <p class="miudo">Cadastre no Ponto Livre e exporte o backup, ou entre como RH aqui para cadastrar.</p>
+    </div>
+    <button id="btnAcessoRH" class="btn ghost largo" type="button">Sou RH / Administrador</button>
+    <p class="miudo acesso-pe">Funciona offline. Os dados ficam salvos neste aparelho.</p>
+  </div>
+</section>
+
+<!-- ================= APP ================= -->
+<div id="app" class="oculto">
+  <header class="topo">
+    <div class="marca">
+      <img src="icone-192.png" alt="">
+      <div>
+        <h1>Ponto Facial</h1>
+        <p id="nomeEmpresa">Minha Empresa</p>
+      </div>
+    </div>
+    <div class="topo-acoes">
+      <span id="relogio" class="relogio">--:--:--</span>
+      <button id="btnInstalar" class="btn ghost oculto" type="button" title="Instalar no tablet">⬇ Instalar</button>
+      <button id="btnAbrirFolha" class="btn ghost" type="button" title="Minha folha de ponto">📋 Minha folha</button>
+      <button id="btnMenu" class="btn ghost icone" type="button" title="Menu do RH">☰</button>
+    </div>
+  </header>
+
+  <!-- ---------- MODO TERMINAL (câmera) ---------- -->
+  <main id="telaTerminal" class="terminal">
+    <div class="camera-area" id="cameraArea">
+      <video id="video" autoplay playsinline muted></video>
+      <div id="guia" class="guia"></div>
+      <div id="status" class="status-camera">Iniciando a câmera…</div>
+      <div id="resultado" class="resultado oculto"></div>
+    </div>
+    <div class="terminal-acoes">
+      <button id="btnCamera" class="btn primario grande" type="button">📷 Abrir câmera e bater ponto</button>
+      <button id="btnTrocarCamera" class="btn ghost" type="button" title="Câmera frontal / traseira">🔄</button>
+      <button id="btnPIN" class="btn ghost" type="button">🔢 Bater com PIN</button>
+    </div>
+    <div class="ultimos">
+      <h2>Últimas batidas</h2>
+      <div id="listaUltimos" class="lista-ultimos"></div>
+    </div>
+  </main>
+
+  <!-- ---------- FOLHA DE PONTO DO FUNCIONÁRIO ---------- -->
+  <main id="telaFolha" class="folha-tela oculto">
+    <div class="painel-cab folha-cab">
+      <div>
+        <h2 id="folhaTitulo">Folha de ponto</h2>
+        <span id="folhaSub" class="miudo">Atualizada a cada batida</span>
+      </div>
+      <div class="filtros">
+        <select id="folhaFunc"></select>
+        <button id="btnFolhaHoje" class="btn ghost mini" type="button">Hoje</button>
+        <button id="btnFolhaMes" class="btn ghost mini" type="button">Mês</button>
+        <button id="btnFolhaPDF" class="btn mini" type="button">🖨 Imprimir / PDF</button>
+        <button id="btnFolhaFechar" class="btn ghost mini" type="button">✕ Fechar</button>
+      </div>
+    </div>
+    <div id="folhaArea" class="folha-area"></div>
+  </main>
+
+  <!-- ---------- PAINEL DO RH ---------- -->
+  <main id="telaRH" class="rh oculto">
+    <nav class="tabs">
+      <button class="tab ativo" data-tab="rostos" type="button">Rostos</button>
+      <button class="tab" data-tab="batidas" type="button">Batidas do dia</button>
+      <button class="tab" data-tab="config" type="button">Ajustes</button>
+    </nav>
+
+    <section id="tab-rostos" class="painel">
+      <div class="painel-cab">
+        <h2>Rostos cadastrados</h2>
+        <input id="buscaFunc" type="search" placeholder="Buscar nome…">
+      </div>
+      <p class="miudo">Toque em <b>Cadastrar rosto</b> e peça ao funcionário para olhar para a câmera de frente, com boa luz. Ficam 3 fotos por pessoa (frente, esquerda e direita).</p>
+      <div id="listaRostos" class="lista-rostos"></div>
+    </section>
+
+    <section id="tab-batidas" class="painel oculto">
+      <div class="painel-cab">
+        <h2>Batidas do dia</h2>
+        <div class="filtros">
+          <input id="batData" type="date">
+          <button id="btnExportar" class="btn" type="button">⬇ Exportar para o Ponto Livre</button>
+        </div>
+      </div>
+      <div class="tabela-wrap">
+        <table class="grade">
+          <thead><tr><th>Hora</th><th>Funcionário</th><th>Batida</th><th>Como</th><th>Confiança</th></tr></thead>
+          <tbody id="corpoBatidas"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-config" class="painel oculto">
+      <div class="cfg-grid">
+        <div class="cfg-card">
+          <h3>Empresa</h3>
+          <label for="cfgEmpresa">Nome da empresa</label>
+          <input id="cfgEmpresa" type="text">
+          <label for="cfgLimiar">Semelhança mínima do rosto (%)</label>
+          <input id="cfgLimiar" type="number" min="50" max="95" step="1">
+          <p class="miudo">Padrão 70%. Muito alto recusa pessoas reais; muito baixo pode confundir rostos parecidos.</p>
+        </div>
+        <div class="cfg-card">
+          <h3>Modo de reconhecimento</h3>
+          <label for="cfgMotor">Motor</label>
+          <select id="cfgMotor">
+            <option value="local">Rápido, no aparelho (padrão)</option>
+            <option value="ia">Mais preciso, com modelo de IA (1º uso precisa de internet)</option>
+          </select>
+          <p class="miudo">O modo IA baixa um modelo de ~2 MB uma única vez e depois funciona offline. É mais lento em tablets antigos.</p>
+          <button id="btnBaixarIA" class="btn ghost" type="button">Baixar modelo de IA</button>
+          <span id="statusIA" class="miudo"></span>
+        </div>
+        <div class="cfg-card">
+          <h3>Dados</h3>
+          <p class="miudo">O tablet guarda os rostos e as batidas. Leve as batidas para o Ponto Livre pelo botão Exportar (aba Batidas).</p>
+          <button id="btnExportarBackup" class="btn" type="button">⬇ Backup completo (.json)</button>
+          <button id="btnImportarBackup" class="btn ghost" type="button">⬆ Importar funcionários</button>
+          <input type="file" id="fileBackup" accept="application/json" hidden>
+          <hr>
+          <button id="btnSairRH" class="btn ghost" type="button">Voltar ao modo câmera</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ================= MODAL GENÉRICO ================= -->
+<div id="modal" class="modal oculto">
+  <div class="modal-card">
+    <div class="modal-cab">
+      <h3 id="modalTitulo">—</h3>
+      <button id="btnFecharModal" class="btn ghost icone" type="button">✕</button>
+    </div>
+    <div id="modalCorpo"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/facial.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
