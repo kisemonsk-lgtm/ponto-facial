@@ -658,11 +658,13 @@ function mostrarApp() {
 function abrirRH() {
   if (cameraAberta) fecharCamera();
   fecharFolha();
-  if (location.hash !== "#rh") history.replaceState(null, "", location.pathname + location.search + "#rh");
+  if (location.hash !== "#rh") { try { history.replaceState(null, "", location.pathname + location.search + "#rh"); } catch (e) {} }
   const btn = $("#btnMenu");
   if (btn) { btn.textContent = "📷 Ponto"; btn.title = "Voltar ao modo câmera"; }
   const link = $("#linkRH");
   if (link) link.textContent = location.origin + location.pathname + "#rh";
+  const chk = $("#cfgAbrirRH");
+  if (chk) chk.checked = !!estado.abrirRH;
   fecharResultado();
   $("#telaTerminal").classList.add("oculto");
   $("#telaRH").classList.remove("oculto");
@@ -672,7 +674,7 @@ function abrirRH() {
 function fecharRH() {
   $("#telaRH").classList.add("oculto");
   $("#telaTerminal").classList.remove("oculto");
-  if (location.hash === "#rh") history.replaceState(null, "", location.pathname + location.search);
+  if (location.hash === "#rh") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
   const btn = $("#btnMenu");
   if (btn) { btn.textContent = "☰"; btn.title = "Painel do RH"; }
   if (folhaFuncId && !$("#telaFolha").classList.contains("oculto")) renderFolha();
@@ -781,19 +783,33 @@ function ligarEventos() {
   $("#btnImportarBackup").addEventListener("click", () => $("#fileBackup").click());
   $("#fileBackup").addEventListener("change", e => { const f = e.target.files[0]; if (f) importarArquivo(f); e.target.value = ""; });
   $("#btnSairRH").addEventListener("click", fecharRH);
+  const chkRH = $("#cfgAbrirRH");
+  if (chkRH) chkRH.addEventListener("change", e => {
+    estado.abrirRH = e.target.checked;
+    salvar();
+    toast(e.target.checked ? "Este aparelho agora abre no painel do RH." : "Este aparelho agora abre na câmera.");
+  });
   window.addEventListener("beforeunload", () => { if (stream) stream.getTracks().forEach(t => t.stop()); });
 }
 
 /* ---------------------------- partida ----------------------------- */
+/** Rota pelo endereço: .../#rh abre o painel do RH; sem #rh abre a câmera. */
+function seguirRota() {
+  const querRH = location.hash.replace(/^#/, "").toLowerCase() === "rh";
+  const rhAberto = !$("#telaRH").classList.contains("oculto");
+  if (querRH && !rhAberto) abrirRH();
+  else if (!querRH && rhAberto) fecharRH();
+}
+
 ligarEventos();
 mostrarApp();
-if (location.hash === "#rh") {
-  abrirRH();
-  // se o endereço mudar à mão (link ...#rh ou sem nada), acompanha
-  window.addEventListener("hashchange", () => {
-    if (location.hash === "#rh") abrirRH(); else fecharRH();
-  });
+if (estado.abrirRH && !location.hash) {
+  // o RH pediu para este aparelho abrir sempre no painel
+  try { history.replaceState(null, "", location.pathname + location.search + "#rh"); } catch (e) {}
 }
+seguirRota();
+window.addEventListener("hashchange", seguirRota);
+window.addEventListener("pageshow", seguirRota);
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
   navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker não registrou:", e));
 }

@@ -1,5 +1,5 @@
 /* Service worker do Ponto Facial: deixa o app funcionar offline no tablet. */
-const CACHE = "ponto-facial-v4";
+const CACHE = "ponto-facial-v5";
 const ESSENCIAIS = [
   "./",
   "index.html",

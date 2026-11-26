@@ -251,3 +251,5 @@ table.grade { border-collapse: separate; border-spacing: 0; width: 100%; font-si
   border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px;
 }
 .aviso-rh code { background: #fff; padding: 2px 6px; border-radius: 6px; font-size: 12px; word-break: break-all; }
+.chk-linha { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--texto); font-weight: 600; margin: 4px 0 2px; cursor: pointer; }
+.chk-linha input { width: 18px; height: 18px; accent-color: var(--carmim); }
