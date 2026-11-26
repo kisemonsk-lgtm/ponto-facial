@@ -669,7 +669,10 @@ function abrirRH() {
   $("#telaTerminal").classList.add("oculto");
   $("#telaRH").classList.remove("oculto");
   $("#batData").value = hojeISO();
-  renderRostos(); renderBatidas(); preencherConfig();
+  // cada pedaço do painel é desenhado por conta própria: um erro num deles não impede o RH de abrir
+  [["Rostos", renderRostos], ["Batidas", renderBatidas], ["Ajustes", preencherConfig]].forEach(([nome, fn]) => {
+    try { fn(); } catch (e) { console.error("Falha ao desenhar " + nome + ":", e); }
+  });
 }
 function fecharRH() {
   $("#telaRH").classList.add("oculto");
@@ -797,8 +800,16 @@ function ligarEventos() {
 function seguirRota() {
   const querRH = location.hash.replace(/^#/, "").toLowerCase() === "rh";
   const rhAberto = !$("#telaRH").classList.contains("oculto");
-  if (querRH && !rhAberto) abrirRH();
-  else if (!querRH && rhAberto) fecharRH();
+  try {
+    if (querRH && !rhAberto) abrirRH();
+    else if (!querRH && rhAberto) fecharRH();
+  } catch (e) {
+    // mesmo com erro em algum detalhe, a tela do RH tem de aparecer
+    console.error("Erro ao abrir a rota:", e);
+    $("#telaTerminal").classList.add("oculto");
+    $("#telaFolha").classList.add("oculto");
+    $("#telaRH").classList.remove("oculto");
+  }
 }
 
 ligarEventos();
