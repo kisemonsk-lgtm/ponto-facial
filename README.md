@@ -1,5 +1,9 @@
 # Ponto Facial — o app do tablet
 
+> **No ar:** https://kisemonsk-lgtm.github.io/ponto-facial/ — abra no Chrome do tablet e
+> toque em **⬇ Instalar** (ou menu ⋮ → “Adicionar à tela inicial”). A câmera só funciona em
+> https, e esse endereço já é https.
+
 App de **registro de ponto por reconhecimento facial** para o tablet da obra, feito
 sobre a logo da CAS. É um site instalável (PWA): abre no navegador, pode ser
 “instalado” na tela inicial e **funciona sem internet** depois do primeiro acesso.
@@ -14,6 +18,21 @@ sobre a logo da CAS. É um site instalável (PWA): abre no navegador, pode ser
    - **Rostos** — cadastrar/refazer o rosto de cada funcionário (3 fotos: frente, esquerda, direita), definir PIN, apagar rosto;
    - **Batidas do dia** — tudo o que foi batido, com hora, tipo, como foi reconhecido e a confiança;
    - **Ajustes** — nome da empresa, semelhança mínima, motor de reconhecimento, backup e importação.
+
+## Folha de ponto do funcionário
+
+A cada batida o app **abre a folha de ponto daquela pessoa, já atualizada** (dia ou mês),
+com previsto × trabalhado, extras 50%/100%, atrasos, saldo, “falta bater a saída” e os campos
+de assinatura — dá para **imprimir ou salvar em PDF** na hora. O botão **📋 Minha folha**
+no topo abre a mesma folha quando quiser.
+
+## Fotos do rosto
+
+- No **cadastro do RH** ficam salvas **3 fotos** do funcionário (frente, esquerda, direita) —
+  é o rosto oficial dele no sistema.
+- Na **batida**, nenhuma foto é tirada nem guardada: a comparação é feita na hora, na memória,
+  e a batida registra só a hora e a nota de semelhança. As imagens da câmera não são armazenadas.
+- A exportação para o Ponto Livre leva apenas nomes e horários — nunca as fotos.
 
 ## Ligação com o Ponto Livre
 
