@@ -658,6 +658,11 @@ function mostrarApp() {
 function abrirRH() {
   if (cameraAberta) fecharCamera();
   fecharFolha();
+  if (location.hash !== "#rh") history.replaceState(null, "", location.pathname + location.search + "#rh");
+  const btn = $("#btnMenu");
+  if (btn) { btn.textContent = "📷 Ponto"; btn.title = "Voltar ao modo câmera"; }
+  const link = $("#linkRH");
+  if (link) link.textContent = location.origin + location.pathname + "#rh";
   fecharResultado();
   $("#telaTerminal").classList.add("oculto");
   $("#telaRH").classList.remove("oculto");
@@ -667,6 +672,9 @@ function abrirRH() {
 function fecharRH() {
   $("#telaRH").classList.add("oculto");
   $("#telaTerminal").classList.remove("oculto");
+  if (location.hash === "#rh") history.replaceState(null, "", location.pathname + location.search);
+  const btn = $("#btnMenu");
+  if (btn) { btn.textContent = "☰"; btn.title = "Painel do RH"; }
   if (folhaFuncId && !$("#telaFolha").classList.contains("oculto")) renderFolha();
   renderUltimos();
 }
@@ -704,6 +712,12 @@ window.addEventListener("beforeinstallprompt", e => {
 function ligarEventos() {
   $("#btnAcessoRH").addEventListener("click", () => { mostrarApp(); abrirRH(); });
   $("#btnMenu").addEventListener("click", () => { $("#telaRH").classList.contains("oculto") ? abrirRH() : fecharRH(); });
+  const btnCopiar = $("#btnCopiarLinkRH");
+  if (btnCopiar) btnCopiar.addEventListener("click", async () => {
+    const link = location.origin + location.pathname + "#rh";
+    try { await navigator.clipboard.writeText(link); toast("Link do RH copiado: " + link, 5000); }
+    catch (e) { prompt("Copie o link do RH:", link); }
+  });
   $("#btnAbrirFolha").addEventListener("click", () => {
     const lista = estado.funcionarios.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
     if (!lista.length) { toast("Nenhum funcionário cadastrado ainda."); return; }
@@ -773,6 +787,13 @@ function ligarEventos() {
 /* ---------------------------- partida ----------------------------- */
 ligarEventos();
 mostrarApp();
+if (location.hash === "#rh") {
+  abrirRH();
+  // se o endereço mudar à mão (link ...#rh ou sem nada), acompanha
+  window.addEventListener("hashchange", () => {
+    if (location.hash === "#rh") abrirRH(); else fecharRH();
+  });
+}
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
   navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker não registrou:", e));
 }
