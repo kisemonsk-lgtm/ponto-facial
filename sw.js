@@ -1,11 +1,11 @@
 /* Service worker do Ponto Facial: deixa o app funcionar offline no tablet. */
-const CACHE = "ponto-facial-v5";
+const CACHE = "ponto-facial-v6";
 const ESSENCIAIS = [
   "./",
   "index.html",
-  "css/estilo.css",
-  "js/app.js",
-  "js/facial.js",
+  "css/estilo.css?v=6",
+  "js/facial.js?v=6",
+  "js/app.js?v=6",
   "manifest.webmanifest",
   "icone-192.png",
   "icone-512.png",
@@ -45,7 +45,18 @@ self.addEventListener("fetch", e => {
     );
     return;
   }
-  // arquivos do app: rede primeiro, cache quando estiver sem internet
+  // HTML e JavaScript: sempre busca a versão nova na rede (nada de ficar preso em versão velha)
+  if (req.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css")) {
+    e.respondWith(
+      fetch(req).then(resp => {
+        const copia = resp.clone();
+        caches.open(CACHE).then(c => c.put(req, copia)).catch(() => {});
+        return resp;
+      }).catch(() => caches.match(req).then(r => r || caches.match("index.html")))
+    );
+    return;
+  }
+  // demais arquivos: rede primeiro, cache quando estiver sem internet
   e.respondWith(
     fetch(req).then(resp => {
       const copia = resp.clone();
